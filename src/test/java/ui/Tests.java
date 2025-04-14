@@ -8,13 +8,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
-
 import static PageObjects.HomePage.BASE_URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -34,12 +28,11 @@ public class Tests extends BaseTest {
     @CsvFileSource(resources = "/openPagesSource.csv")
     void openPagesTests(String chapterName, String path, String title) {
         HomePage homePage = new HomePage(driver);
-        homePage.open();
 
         driver.findElement(By.xpath("//h5[text() = '" + chapterName + "']/../a[@href = '" + path + "']")).click();
 
         String actualUrl = homePage.getCurrentUrl();
-        String actualTitle = homePage.getTitle();
+        String actualTitle = homePage.getTitle().getText();
 
         assertEquals(BASE_URL + path, actualUrl, "URLs don't match");
         assertEquals(title, actualTitle, "Titles don't match");
@@ -49,14 +42,14 @@ public class Tests extends BaseTest {
     @DisplayName("Проверка страницы Multilanguage page")
     void multilanguagePageTest() {
         HomePage homePage = new HomePage(driver);
-        homePage.open();
         MultiLangPage multiLangPage = homePage.openMultiLangPage();
 
         String actualUrl = multiLangPage.getCurrentUrl();
-        String actualTitle = multiLangPage.getTitle();
+        String actualTitle = multiLangPage.getTitle().getText();
 
         assertEquals(BASE_URL + "multilanguage.html", actualUrl, "URLs don't match");
         assertEquals("", actualTitle, "Titles don't match");
+        assertEquals("Hands-On Selenium WebDriver with Java",multiLangPage.getWebTitle(), "Titles don't match");
     }
 
     @ParameterizedTest
@@ -64,13 +57,13 @@ public class Tests extends BaseTest {
     @CsvSource({"frames.html, Frames"})
     void frameTests(String path, String title) {
         HomePage homePage = new HomePage(driver);
-        homePage.open();
         FramesPage framesPage = homePage.openFramesPage();
 
         WebElement frame = driver.findElement(By.cssSelector("frame[name='frame-header']"));
         driver.switchTo().frame(frame);
 
         assertEquals(BASE_URL + path, framesPage.getCurrentUrl(), "URLs don't match");
-        assertEquals(title, framesPage.getTitle(), "Titles don't match");
+        assertEquals(title, framesPage.getTitle().getText(), "Titles don't match");
+        assertEquals("Hands-On Selenium WebDriver with Java",framesPage.getWebTitle(), "Titles don't match");
     }
 }
